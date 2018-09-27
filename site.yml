@@ -1,0 +1,35 @@
+---
+- name: Create openstack environment
+  hosts: localhost
+  pre_tasks:
+    - name: Create network
+      os_network:
+        name: "{{networkname}}"
+    - name: Create subnet
+      os_subnet:
+        network_name: "{{networkname}}"
+        name: "{{subnetworkname}}"
+        cidr: 10.7.10.0/24
+        dns_nameservers:
+          - 8.8.8.8
+          - 8.8.4.4
+      register: subnet
+    - name: create router
+      os_router:
+        name: "{{routername}}"
+        network: "public"
+        interfaces:
+          - "{{subnetworkname}}"
+      register: router
+    - name: Set variables
+      set_fact:
+        name: "{{networkname}}"
+        state: present
+        routeruuid: "{{ router.id }}"
+        subnetuuid: "{{ subnet.id }}"
+  roles:
+    - openstack-security-groups    
+    - openstack-instance
+
+- import_playbook: nginx.yml
+  
