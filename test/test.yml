@@ -1,0 +1,16 @@
+---
+- hosts: nginx
+  become: true
+  gather_facts: no
+  remote_user: ubuntu
+  
+  tasks: 
+    - name: unitTest - Nginx is running
+      command: /bin/systemctl status nginx
+      register: result
+      changed_when: false
+      failed_when: "'Active: active (running)' not in result.stdout"
+      tags:
+        - unitTests
+    - debug:
+        msg: "System: {{ result.stdout }}"
