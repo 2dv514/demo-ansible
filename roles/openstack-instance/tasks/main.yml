@@ -27,6 +27,7 @@
 - name: Update inventory
   add_host:
     name: "{{ hostname }}"
+    groups: nginx
     ansible_ssh_host: "{{ instance.openstack.accessIPv4 }}"
     ansible_ssh_user: ubuntu
     groupname: gr_{{ hostname }}

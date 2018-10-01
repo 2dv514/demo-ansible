@@ -15,3 +15,11 @@
 
     - name: make sure nginx is running
       service: name=nginx state=started
+
+    - name: unitTest - Nginx is running
+      command: /bin/systemctl status nginx
+      register: result
+      changed_when: false
+      failed_when: "'Active: active (running)' not in result.stdout"
+      tags:
+        - unitTests
