@@ -1,16 +1,26 @@
 ---
 - hosts: nginx
   become: true
-  gather_facts: no
+  gather_facts: false
   remote_user: ubuntu
   
-  tasks: 
-    - name: unitTest - Nginx is running
+  tasks:
+    - name: Test that Nginx is running
       command: /bin/systemctl status nginx
       register: result
       changed_when: false
       failed_when: "'Active: active (running)' not in result.stdout"
       tags:
-        - unitTests
-    - debug:
-        msg: "System: {{ result.stdout }}"
+        - test
+    - name: Test landing page
+      uri:
+        url: "http://{{inventory_hostname}}"
+        return_content: yes
+      register: webpage
+      tags:
+        - webtest
+    - name: Fail if ´Welcome to nginx!´ is not in the page content
+      fail:
+      when: "'Welcome to nginx!' not in webpage.content"
+      tags:
+        - webtest
